@@ -26,7 +26,11 @@ web_urls = [
     "https://www.w3schools.com/mysql/mysql_rdbms.asp",
     "https://www.w3schools.com/mysql/mysql_sql.asp",
     "https://www.w3schools.com/mysql/mysql_where.asp",
-    "https://www.w3schools.com/mysql/mysql_and_or.asp"
+    "https://www.w3schools.com/mysql/mysql_and_or.asp",
+    "https://www.w3schools.com/mysql/mysql_orderby.asp",
+    "https://www.w3schools.com/mysql/mysql_insert.asp",
+    "https://www.w3schools.com/mysql/mysql_null_values.asp",
+    "https://www.w3schools.com/mysql/mysql_update.asp"
 ]
 
 rag_instance = RAG(web_urls)
