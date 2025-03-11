@@ -1,14 +1,15 @@
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.document_loaders import TextLoader
+# from langchain_community.document_loaders import TextLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_text_splitters import CharacterTextSplitter
-from langchain.chains.combine_documents import create_stuff_documents_chain
+# from langchain_text_splitters import CharacterTextSplitter
+# from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from pinecone import Pinecone, ServerlessSpec, PodSpec  
 from langchain_pinecone import PineconeVectorStore
 from langchain import hub
+from langchain.chains import RetrievalQA
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 import os
@@ -33,11 +34,7 @@ class RAG:
                     class_=("contentcontainer", "belowtopnavcontainer", "belowtopnav")
                 )
             ),
-        )
-
-        # self.loader = TextLoader("RDBMS.txt")
-
-        
+        )     
 
         self.groq_llm = ChatGroq(
             api_key=os.getenv("GROQ_API_KEY"), 
@@ -45,14 +42,9 @@ class RAG:
             temperature=0
         )
 
-        # self.text_splitter = RecursiveCharacterTextSplitter(
-        #     chunk_size=2000, 
-        #     chunk_overlap=100
-        # )
-
-        self.text_splitter = CharacterTextSplitter(
-            chunk_size=1000, 
-            chunk_overlap=0
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000, 
+            chunk_overlap=100
         )
 
         self.create_pinecone_index(self.vectorstore_index_name)
@@ -102,13 +94,18 @@ class RAG:
         self.retriever = self.vectorstore.as_retriever()
         print("Retriever is:", self.retriever)
         self.rag_chain = (
-            {"context": self.retriever | self.format_docs, "question": RunnablePassthrough()}
+            {"context": self.retriever | self.format_docs, "question": RunnablePassthrough(),}
             | self.rag_prompt
             | self.groq_llm
             | StrOutputParser()
         )
         # add guardrails check here
 
+    # def create_chain(self):
+    #     self.load_docs_into_vectorstore_chain()
+    #     self.qa_chain = RetrievalQA.from_llm(
+    #         self.groq_llm, retriever=self.vectorstore.as_retriever(), prompt=self.rag_prompt
+    #     )
 
     def query_answer(self, query, vectorstorecreated):
         if not vectorstorecreated:
@@ -116,3 +113,4 @@ class RAG:
             vectorstorecreated = True
         
         return self.rag_chain.invoke(query), vectorstorecreated
+        # return self.qa_chain(query), vectorstorecreated

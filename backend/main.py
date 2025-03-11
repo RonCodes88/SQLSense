@@ -8,9 +8,7 @@ from rag import RAG
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-]
+origins = ["http://localhost:3000", "ws://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,20 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize the RAG class with web_urls
-web_urls = [
-    "https://www.w3schools.com/mysql/mysql_intro.asp",
-    "https://www.w3schools.com/mysql/mysql_rdbms.asp",
-    "https://www.w3schools.com/mysql/mysql_sql.asp",
-    "https://www.w3schools.com/mysql/mysql_where.asp",
-    "https://www.w3schools.com/mysql/mysql_and_or.asp",
-    "https://www.w3schools.com/mysql/mysql_orderby.asp",
-    "https://www.w3schools.com/mysql/mysql_insert.asp",
-    "https://www.w3schools.com/mysql/mysql_null_values.asp",
-    "https://www.w3schools.com/mysql/mysql_update.asp"
-]
 
-rag_instance = RAG(web_urls)
+WEB_URLS=os.getenv("WEB_URLS").split(",")
+rag_instance = RAG(WEB_URLS)
 
 class QueryRequest(BaseModel):
     user_input: str
@@ -60,6 +47,8 @@ async def websocket_endpoint(websocket: WebSocket):
             print("Sent response", response)
     except WebSocketDisconnect:
         print("WebSocket connection closed")
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host="localhost", port=8000, reload=True)

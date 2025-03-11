@@ -8,69 +8,62 @@ import { Sparkles } from "lucide-react";
 export default function NaturalLanguageGenerator() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
-    { id: 1, role: "system", content: "Welcome! How can I assist you today?" },
-    {
-      id: 2,
-      role: "user",
-      content: "Can you explain what a natural language generator does?",
-    },
-    {
-      id: 3,
-      role: "system",
-      content:
-        "A natural language generator is an AI-powered system that produces human-like text based on input or prompts. It can be used for various purposes such as content creation, chatbots, or automated reporting.",
-    },
+    { id: 1, role: "system", content: "Welcome! I am SQLSense, your database assistant. How can I assist you today?" },
   ]);
 
+  const websocket = useRef<WebSocket | null>(null);
+
   const connectWebSocket = useCallback(() => {
-    websocket.current = new WebSocket("ws://localhost:8000/ws");
+    if (websocket.current && websocket.current.readyState !== WebSocket.CLOSED) {
+      return; // Prevent opening multiple connections
+    }
+  
+    websocket.current = new WebSocket("ws://127.0.0.1:8000/ws");
   
     websocket.current.onopen = () => {
       console.log("WebSocket connection opened");
     };
   
     websocket.current.onmessage = (event) => {
-      console.log("Message received from backend:", event.data);
-      setMessages((prev) => [
-        ...prev,
-        { id: prev.length + 1, role: "system", content: event.data },
-      ]);
+      console.log("Message received:", event.data);
+      setMessages((prev) => [...prev, { id: prev.length + 1, role: "system", content: event.data }]);
     };
   
     websocket.current.onclose = () => {
-      console.log("WebSocket connection closed");
+      console.log("WebSocket connection closed. Reconnecting in 1 second...");
       setTimeout(connectWebSocket, 1000);
     };
-  }, []);
   
-  const websocket = useRef<WebSocket | null>(null);
+    websocket.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+  }, []);
 
   useEffect(() => {
     connectWebSocket();
-  
+
     return () => {
       if (websocket.current) {
         websocket.current.close();
       }
     };
-  }, [connectWebSocket]); // No dependencies to avoid unnecessary re-runs
-
+  }, [connectWebSocket]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      input.trim() &&
-      websocket.current &&
-      websocket.current.readyState === WebSocket.OPEN
-    ) {
+    if (!input.trim()) return;
+    
+    if (websocket.current?.readyState === WebSocket.OPEN) {
       const message = { id: messages.length + 1, role: "user", content: input };
       setMessages((prev) => [...prev, message]);
       websocket.current.send(input);
       setInput("");
     } else {
-      console.log("WebSocket is not open");
+      console.log("WebSocket is not open. Attempting to reconnect...");
+      connectWebSocket();
     }
   };
+  
 
   return (
     <div className="flex flex-col h-screen bg-white">
