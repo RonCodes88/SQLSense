@@ -19,8 +19,10 @@ app.add_middleware(
 )
 
 
-MySQL_WEB_URLS=os.getenv("WEB_URLS").split(",")
-rag_instance = RAG(MySQL_WEB_URLS)
+MySQL_WEB_URLS=os.getenv("MySQL_WEB_URLS").split(",")
+PostgreSQL_WEB_URLS=os.getenv("PostgreSQL_WEB_URLS").split(",")
+WEB_URLS = MySQL_WEB_URLS + PostgreSQL_WEB_URLS
+rag_instance = RAG(WEB_URLS)
 
 class QueryRequest(BaseModel):
     user_input: str
