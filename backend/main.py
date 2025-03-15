@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import uvicorn
 import os
 from rag import RAG
+import boto3
 
 
 app = FastAPI()
@@ -18,10 +19,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+s3_client = boto3.client('s3')
+bucket_name = os.getenv('S3_BUCKET_NAME')
+file_key = os.getenv('S3_FILE_KEY')
 
-MySQL_WEB_URLS=os.getenv("MySQL_WEB_URLS").split(",")
-PostgreSQL_WEB_URLS=os.getenv("PostgreSQL_WEB_URLS").split(",")
+def get_urls_s3(bucket_name, file_key):
+    response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
+    content = response['Body'].read().decode('utf-8')
+    return content
+
+urls_content = get_urls_s3(bucket_name, file_key)
+lines = urls_content.split("\n")
+MySQL_WEB_URLS = []
+PostgreSQL_WEB_URLS = []
+
+for line in lines:
+    if line.startswith("MySQL_WEB_URLS="):
+        MySQL_WEB_URLS = line.split("=", 1)[1].split(",")
+    elif line.startswith("PostgreSQL_WEB_URLS="):
+        PostgreSQL_WEB_URLS = line.split("=", 1)[1].split(",")
+
 WEB_URLS = MySQL_WEB_URLS + PostgreSQL_WEB_URLS
+print(WEB_URLS)
+
 rag_instance = RAG(WEB_URLS)
 
 class QueryRequest(BaseModel):
