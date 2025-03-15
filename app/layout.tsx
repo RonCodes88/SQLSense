@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SQLSense",
   description: "A natural language to SQL generator",
+  icons: "/icon.png",
 };
 
 export default function RootLayout({
