@@ -19,9 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-s3_client = boto3.client('s3')
+s3_access_key = os.getenv('S3_ACCESS_KEY')
+s3_secret_access_key = os.getenv('S3_SECRET_ACCESS_KEY')
 bucket_name = os.getenv('S3_BUCKET_NAME')
 file_key = os.getenv('S3_FILE_KEY')
+
+s3_client = boto3.client('s3',
+                         aws_access_key_id=s3_access_key,
+                         aws_secret_access_key=s3_secret_access_key)
 
 def get_urls_s3(bucket_name, file_key):
     response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
