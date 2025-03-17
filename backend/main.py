@@ -37,14 +37,17 @@ urls_content = get_urls_s3(bucket_name, file_key)
 lines = urls_content.split("\n")
 MySQL_WEB_URLS = []
 PostgreSQL_WEB_URLS = []
+MongoDB_WEB_URLS = []
 
 for line in lines:
     if line.startswith("MySQL_WEB_URLS="):
         MySQL_WEB_URLS = line.split("=", 1)[1].split(",")
     elif line.startswith("PostgreSQL_WEB_URLS="):
         PostgreSQL_WEB_URLS = line.split("=", 1)[1].split(",")
+    elif line.startswith("MongoDB_WEB_URLS="):
+        MongoDB_WEB_URLS = line.split("=", 1)[1].split(",")
 
-WEB_URLS = MySQL_WEB_URLS + PostgreSQL_WEB_URLS
+WEB_URLS = MySQL_WEB_URLS + PostgreSQL_WEB_URLS + MongoDB_WEB_URLS
 print(WEB_URLS)
 
 rag_instance = RAG(WEB_URLS)
