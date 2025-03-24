@@ -9,7 +9,14 @@ import boto3
 
 app = FastAPI()
 
-origins = ["http://localhost:3000", "ws://localhost:3000", "sql-sense.vercel.app"]
+origins = [
+    "http://localhost:3000",
+    "ws://localhost:3000",
+    "https://sql-sense.vercel.app",
+    "wss://sql-sense.vercel.app",
+    "http://sql-sense.vercel.app",
+    "ws://sql-sense.vercel.app"
+]
 
 app.add_middleware(
     CORSMiddleware,

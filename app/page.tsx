@@ -18,7 +18,7 @@ export default function NaturalLanguageGenerator() {
       return; // Prevent opening multiple connections
     }
   
-    websocket.current = new WebSocket("https://sqlsense.onrender.com");
+    websocket.current = new WebSocket("wss://sqlsense.onrender.com");
   
     websocket.current.onopen = () => {
       console.log("WebSocket connection opened");
