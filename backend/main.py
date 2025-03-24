@@ -9,7 +9,7 @@ import boto3
 
 app = FastAPI()
 
-origins = ["http://localhost:3000", "ws://localhost:3000"]
+origins = ["http://localhost:3000", "ws://localhost:3000", "sql-sense.vercel.app"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,7 +48,7 @@ for line in lines:
         MongoDB_WEB_URLS = line.split("=", 1)[1].split(",")
 
 WEB_URLS = MySQL_WEB_URLS + PostgreSQL_WEB_URLS + MongoDB_WEB_URLS
-print(WEB_URLS)
+# print(WEB_URLS)
 
 rag_instance = RAG(WEB_URLS)
 
