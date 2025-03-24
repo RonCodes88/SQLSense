@@ -1,3 +1,7 @@
+# SQLSense Tech Stack
+- NextJS, TailwindCSS, FastAPI, Groq (Llama3), Pinecone, Shadcn
+
+# SQLSense System Diagram
 ![image](https://github.com/user-attachments/assets/a90ff278-b5d0-42a8-8969-c98080e4a3b4)
 
 
