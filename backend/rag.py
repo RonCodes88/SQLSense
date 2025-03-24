@@ -58,16 +58,18 @@ class RAG:
     def create_pinecone_index(self, vectorstore_index_name):
         pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))  
         spec = ServerlessSpec(cloud='aws', region='us-east-1')  
-        if vectorstore_index_name in pc.list_indexes().names():  
-            pc.delete_index(vectorstore_index_name)  
-        pc.create_index(  
-            vectorstore_index_name,  
-            dimension=1536,
-            metric='cosine',  
-            spec=spec  
-        )  
-        while not pc.describe_index(vectorstore_index_name).status['ready']:  
-            time.sleep(1)
+        if vectorstore_index_name not in pc.list_indexes().names():  
+            print(f"Creating new index {vectorstore_index_name}")
+            pc.create_index(  
+                vectorstore_index_name,  
+                dimension=1536,
+                metric='cosine',  
+                spec=spec  
+            )
+            while not pc.describe_index(vectorstore_index_name).status['ready']:  
+                    time.sleep(1)
+        else:
+            print(f"Index {vectorstore_index_name} already exists.")
     
     def load_docs_into_vectorstore_chain(self):
         docs = self.loader.load()
